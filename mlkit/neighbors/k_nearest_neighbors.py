@@ -18,13 +18,22 @@ class KNeighborsClassifier(Model):
         """
         super().__init__()
         self.n_neighbors = n_neighbors
-        
+    
     def _fit(self, x:np.ndarray, y:np.ndarray):
         """
         Prepare model to predict class by present neighbors
         Stock the points
         """
+        self.x = x
+        self.y = y
+
+    @Model._dependance_check
+    def _predict(self, x:np.ndarray) -> np.ndarray:
+        """Find the n_nearest neighbors and return the class of most common"""
+        distances = np.linalg.norm(self.x - x, axis=1)
+        sorted_distances = np.sort(distances)
 
 def main():
-    a = KNeighborsClassifier()
-    a.fit([1,2], [1,2])
+    a = KNeighborsClassifier(n_neighbors=3)
+    a.fit([[0], [3], [2], [3]], [0,0,1,1])
+    print(a.predict([[1.1]]))
