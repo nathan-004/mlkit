@@ -1,5 +1,6 @@
 import numpy as np
 from typing import NamedTuple
+from collections import defaultdict
 
 from mlkit.utils.model import Model
 
@@ -32,8 +33,18 @@ class KNeighborsClassifier(Model):
         """Find the n_nearest neighbors and return the class of most common"""
         distances = np.linalg.norm(self.x - x, axis=1)
         sorted_distances = np.sort(distances)
+        classes = defaultdict(lambda : 0) # Contient la classe et le nombre de fois où c'est contenu
+        total = 0
+        for el in sorted_distances[:self.n_neighbors]:
+            item_idx = np.where(distances == el)[0]
+            for idx in item_idx:
+                if total >= self.n_neighbors:
+                    break
+                classes[self.y[idx]] += 1
+                total += 1
+        return max(classes, key=lambda x: classes[x])
 
 def main():
     a = KNeighborsClassifier(n_neighbors=3)
-    a.fit([[0], [3], [2], [3]], [0,0,1,1])
+    a.fit([[0], [1], [2], [3]], [0,0,1,1])
     print(a.predict([[1.1]]))
