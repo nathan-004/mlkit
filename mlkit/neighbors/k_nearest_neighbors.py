@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.cm import rainbow
+
 from typing import NamedTuple
 from collections import defaultdict
 
@@ -43,8 +46,19 @@ class KNeighborsClassifier(Model):
                 classes[self.y[idx]] += 1
                 total += 1
         return max(classes, key=lambda x: classes[x])
+    
+    @Model._dependance_check
+    def plot(self):
+        """Plot a scatter of the datas based on the classes"""
+        # Maximum 2 features
+        print(self.x[:, 0], self.x[:, 1])
+        plt.scatter(self.x[:, 0], self.x[:, 1])
+        plt.xlabel("")
+        plt.title("")
+        plt.show()
 
 def main():
     a = KNeighborsClassifier(n_neighbors=3)
-    a.fit([[0], [1], [2], [3]], [0,0,1,1])
-    print(a.predict([[1.1]]))
+    a.fit([[0,1], [1,2], [2,3], [3,4]], [0,0,1,1])
+    print(a.predict([[1.1, 1.5]]))
+    print(a.plot())
