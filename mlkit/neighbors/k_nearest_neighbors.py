@@ -48,13 +48,26 @@ class KNeighborsClassifier(Model):
         return max(classes, key=lambda x: classes[x])
     
     @Model._dependance_check
-    def plot(self):
-        """Plot a scatter of the datas based on the classes"""
-        # Maximum 2 features
-        print(self.x[:, 0], self.x[:, 1])
-        plt.scatter(self.x[:, 0], self.x[:, 1])
-        plt.xlabel("")
-        plt.title("")
+    def plot(self, title="Scatter plot", xlabel="Feature 1", ylabel="Feature 2"):
+        """Plot a scatter of the data, colored by class if available (max 2 features)."""
+        
+        # Vérifie que les données ont au moins 2 features
+        if self.x.shape[1] < 2:
+            raise ValueError("Les données doivent avoir au moins 2 features pour un scatter plot.")
+        
+        if hasattr(self, "y") and self.y is not None:
+            classes = set(self.y)
+            for cls in classes:
+                mask = self.y == cls
+                plt.scatter(self.x[mask, 0], self.x[mask, 1], label=f"Classe {cls}", alpha=0.7)
+            plt.legend()
+        else:
+            plt.scatter(self.x[:, 0], self.x[:, 1], alpha=0.7)
+        
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid(True, linestyle="--", alpha=0.6)
         plt.show()
 
 def main():
