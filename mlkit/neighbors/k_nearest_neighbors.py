@@ -1,11 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.cm import rainbow
 
 from typing import NamedTuple
 from collections import defaultdict
 
 from mlkit.utils.model import Model
+from mlkit.datasets.classification import make_classification
 
 class Point(NamedTuple):
     pass
@@ -71,7 +71,7 @@ class KNeighborsClassifier(Model):
         plt.show()
 
 def main():
+    X, y = make_classification()
     a = KNeighborsClassifier(n_neighbors=3)
-    a.fit([[0,1], [1,2], [2,3], [3,4]], [0,0,1,1])
-    print(a.predict([[1.1, 1.5]]))
-    print(a.plot())
+    a.fit(X, y)
+    a.plot()
