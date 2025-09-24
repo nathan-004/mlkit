@@ -31,12 +31,11 @@ class KNeighborsClassifier(Model):
         self.x = x
         self.y = y
 
-    @Model._dependance_check
-    def _predict(self, x:np.ndarray) -> np.ndarray:
-        """Find the n_nearest neighbors and return the class of most common"""
+    def _single_predict(self, x:np.ndarray) -> np.ndarray:
+        """Find the n_nearest neighbors and return the class of most common -> Returns the solution for one point"""
         distances = np.linalg.norm(self.x - x, axis=1)
         sorted_distances = np.sort(distances)
-        classes = defaultdict(lambda : 0) # Contient la classe et le nombre de fois où c'est contenu
+        classes = defaultdict(lambda : 0)
         total = 0
         for el in sorted_distances[:self.n_neighbors]:
             item_idx = np.where(distances == el)[0]
@@ -48,11 +47,22 @@ class KNeighborsClassifier(Model):
         return max(classes, key=lambda x: classes[x])
     
     @Model._dependance_check
+    def _predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Prédit la classe pour un ou plusieurs points.
+        X peut être un seul point (1D) ou un tableau de points (2D).
+        """
+        if X.ndim == 1:
+            return self._single_predict(X)
+
+        return np.array([self._single_predict(x) for x in X])
+    
+    @Model._dependance_check
     def plot(self, title="Scatter plot", xlabel="Feature 1", ylabel="Feature 2"):
         """Plot a scatter of the data, colored by class if available (max 2 features)."""
         
         # Vérifie que les données ont au moins 2 features
-        if self.x.shape[1] < 2:
+        if self.x.shape[1] != 2:
             raise ValueError("Les données doivent avoir au moins 2 features pour un scatter plot.")
         
         if hasattr(self, "y") and self.y is not None:
@@ -70,8 +80,41 @@ class KNeighborsClassifier(Model):
         plt.grid(True, linestyle="--", alpha=0.6)
         plt.show()
 
+    def plot_predict(self, step=0.1, title="Zones de décision prédites", xlabel="Feature 1", ylabel="Feature 2"):
+        """Display the zones based on the predictions of the model (Only 2D)."""
+
+        if self.x.shape[1] != 2:
+            raise ValueError("plot_predict ne fonctionne qu'avec 2 features.")
+
+        # Définir les limites du plan
+        x_min, x_max = self.x[:, 0].min() - 1, self.x[:, 0].max() + 1
+        y_min, y_max = self.x[:, 1].min() - 1, self.x[:, 1].max() + 1
+
+        # Créer une grille de points
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, step),
+                            np.arange(y_min, y_max, step))
+
+        # Prédire la classe pour chaque point de la grille
+        grid_points = np.c_[xx.ravel(), yy.ravel()]
+        Z = self.predict(grid_points)
+        Z = Z.reshape(xx.shape)
+
+        # Afficher la zone colorée selon les classes
+        plt.contourf(xx, yy, Z, alpha=0.3, cmap="coolwarm")
+
+        if hasattr(self, "y") and self.y is not None:
+            plt.scatter(self.x[:, 0], self.x[:, 1], c=self.y, cmap="coolwarm", edgecolors="k")
+        else:
+            plt.scatter(self.x[:, 0], self.x[:, 1], edgecolors="k")
+
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.show()
+
 def main():
-    X, y = make_classification()
-    a = KNeighborsClassifier(n_neighbors=3)
+    X, y = make_classification(n_classes=2)
+    a = KNeighborsClassifier(n_neighbors=1)
     a.fit(X, y)
     a.plot()
+    a.plot_predict(step=0.01)
