@@ -7,9 +7,6 @@ from collections import defaultdict
 from mlkit.utils.model import Model
 from mlkit.datasets.classification import make_classification
 
-class Point(NamedTuple):
-    pass
-
 class KNeighborsClassifier(Model):
     """Use of the KNN algorithm to solve classification problems"""
     
@@ -115,8 +112,8 @@ class KNeighborsClassifier(Model):
         plt.show()
 
 def main():
-    X, y = make_classification(n_classes=2)
-    a = KNeighborsClassifier(n_neighbors=1)
+    X, y = make_classification(n_classes=4, n_samples=100)
+    a = KNeighborsClassifier(n_neighbors=10)
     a.fit(X, y)
     a.plot()
     a.plot_predict(step=0.01)

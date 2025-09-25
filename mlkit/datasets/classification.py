@@ -49,7 +49,7 @@ def make_classification(
     Pour des datasets plus complexes, des options comme la séparation des classes, le 
     bruit ou des clusters multiples peuvent être ajoutées.
     """
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng(seed=random_state)
     X = rng.random((n_samples, n_features))
     
     y = rng.integers(0, n_classes, size=n_samples)
