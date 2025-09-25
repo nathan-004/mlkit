@@ -78,6 +78,7 @@ class KNeighborsClassifier(Model):
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.grid(True, linestyle="--", alpha=0.6)
+        plt.savefig('figures/scatter.png')
         plt.show()
 
     def plot_predict(self, step=0.1, title="Zones de décision prédites", xlabel="Feature 1", ylabel="Feature 2"):
@@ -110,6 +111,7 @@ class KNeighborsClassifier(Model):
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
+        plt.savefig('figures/decision_sone.png')
         plt.show()
 
 def main():
