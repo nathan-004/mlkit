@@ -1,6 +1,7 @@
 import numpy as np
 
 from mlkit.utils.model import Model
+from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError
 
 class LinearRegression(Model):
     """Solve Linear Problems with LinearRegression"""
