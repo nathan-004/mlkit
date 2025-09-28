@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import random
 
 from mlkit.utils.model import Model
 from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError
@@ -17,13 +19,85 @@ class LinearRegression(Model):
     def _fit(self, x:np.ndarray, y:np.ndarray):
         """
         Find the linear function of the datas
+        Predict continuous values
         
         Parameters
         ----------
         x:np.ndarray
-            Inputs datas
+            Inputs datas in 1D array
         y:np.ndarray
-            Result points
+            Result points in 1D array
         """
+        assert len(x.shape) == 1, "x must be a 1D array"
+        assert len(y.shape) == 1, "y must be a 1D array"
+        assert x.shape[0] == y.shape[0], "x and y must have the same length"
+
         self.x = x
         self.y = y
+
+        self.a, self.b = self._least_squares(x, y)
+
+    def _least_squares(self, x:np.ndarray, y:np.ndarray) -> tuple:
+        """
+        Find the linear function of the datas using least squares method
+        
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas in 1D array
+        y:np.ndarray
+            Result points in 1D array
+
+        Returns
+        -------
+        a:float
+            Slope of the linear function
+        b:float
+            Intercept of the linear function
+        """
+        n = len(x)
+        a = (n * np.dot(x, y) - np.sum(x) * np.sum(y)) / (n * np.dot(x, x) - (np.sum(x))**2)
+        b = (np.sum(y) - a * np.sum(x)) / n
+        return a, b
+    
+    def _predict(self, x:np.ndarray) -> np.ndarray:
+        """
+        Predict the result points using the linear function
+        
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas in 1D array
+
+        Returns
+        -------
+        y_pred:np.ndarray
+            Predicted result points in 1D array
+        """
+        assert len(x.shape) == 1, "x must be a 1D array"
+        return self.a * x + self.b
+    
+    def plot(self):
+        """
+        Plot the datas and the linear function
+        """
+        plt.scatter(self.x, self.y, color='blue', label='Data points')
+        plt.plot(self.x, self._predict(self.x), color='red', label='Fitted line')
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Linear Regression Fit')
+        plt.legend()
+        plt.show()
+
+def main():
+    # Example usage
+    x = [i for i in range(1, 11)]
+    y = [2 * i + 1 + random.randint(-2, 2) for i in x]
+
+    model = LinearRegression()
+    model.fit(x, y)
+    y_pred = model.predict(x)
+
+    print("Predicted values:", y_pred)
+
+    model.plot()

@@ -53,8 +53,9 @@ class Model:
         if type(x) is list:
             x = np.array(x)
         
-        if x.shape[1] != self.x.shape[1]:
-            raise ValueError("Not a valid numbers of features")
+        if len(x.shape) != 1:
+            if x.shape[1] != self.x.shape[1]:
+                raise ValueError("Not a valid numbers of features")
         
         return self._predict(x)
     
