@@ -88,11 +88,12 @@ class LinearRegression(Model):
         plt.title('Linear Regression Fit')
         plt.legend()
         plt.show()
+        plt.savefig("figures/linear_regression.png")
 
 def main():
     # Example usage
-    x = [i for i in range(1, 11)]
-    y = [2 * i + 1 + random.randint(-2, 2) for i in x]
+    x = [i for i in range(1, 100)]
+    y = [2 * i + 1 + random.randint(-25, 25) for i in x]
 
     model = LinearRegression()
     model.fit(x, y)
