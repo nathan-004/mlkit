@@ -4,6 +4,7 @@ import random
 
 from mlkit.utils.model import Model
 from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError
+from mlkit.datasets.continuous import linear_dataset
 
 class LinearRegression(Model):
     """Solve Linear Problems with LinearRegression"""
@@ -92,8 +93,7 @@ class LinearRegression(Model):
 
 def main():
     # Example usage
-    x = [i for i in range(1, 100)]
-    y = [2 * i + 1 + random.randint(-25, 25) for i in x]
+    x, y = linear_dataset(xstep=1, end=100, a=-0.1, b=1)
 
     model = LinearRegression()
     model.fit(x, y)
