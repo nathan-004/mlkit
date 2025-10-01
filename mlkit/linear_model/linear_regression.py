@@ -93,7 +93,7 @@ class LinearRegression(Model):
 
 def main():
     # Example usage
-    x, y = linear_dataset(xstep=1, end=100, a=-0.1, b=1)
+    x, y = linear_dataset(start=0, end=50, xstep=0.5, a=2, b=3, ynoise=20, seed=42)
 
     model = LinearRegression()
     model.fit(x, y)

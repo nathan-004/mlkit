@@ -1,11 +1,15 @@
 """Generate random continuous datasets"""
 
-from random import randint
+import numpy as np
 
-def linear_dataset(start:float = 0, end:float = 10, xstep:int = 1, a:float = 1, b:float = 1, ynoise:int = 3):
+def linear_dataset(start:float = 0, end:float = 10, xstep:float = 1, a:float = 1, b:float = 1, ynoise:float = 3, seed:int = None):
     """
-    Generate a random dataset around the linear function $ax + b$ with a random noise 
+    Generate a random dataset around the linear function ax + b with random noise.
+    Returns numpy arrays for x and y.
     """
-    x = [i for i in range(start, end, xstep)]
-    y = [a * i + b + randint(-ynoise, ynoise) for i in x]
-    return (x, y)
+    if seed is not None:
+        np.random.seed(seed)
+    x = np.arange(start, end, xstep)
+    noise = np.random.uniform(-ynoise, ynoise, size=x.shape)
+    y = a * x + b + noise
+    return x, y
