@@ -60,6 +60,26 @@ class LinearRegression(Model):
         a = (n * np.dot(x, y) - np.sum(x) * np.sum(y)) / (n * np.dot(x, x) - (np.sum(x))**2)
         b = (np.sum(y) - a * np.sum(x)) / n
         return a, b
+
+    def _minimizing_error(self, x:np.ndarray, y:np.ndarray) -> tuple:
+        """
+        Minimize the error to find the best fitted line
+
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas in 1D array
+        y:np.ndarray
+            Result points in 1D array
+
+        Returns
+        -------
+        a:float
+            Slope of the linear function
+        b:float
+            Intercept of the linear function
+        """
+        pass
     
     def _predict(self, x:np.ndarray) -> np.ndarray:
         """
@@ -100,5 +120,6 @@ def main():
     y_pred = model.predict(x)
 
     print("Predicted values:", y_pred)
+
 
     model.plot()
