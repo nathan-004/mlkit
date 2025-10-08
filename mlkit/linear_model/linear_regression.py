@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import random
 
 from mlkit.utils.model import Model
-from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError
+from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError, ErrorFunction
 from mlkit.datasets.continuous import linear_dataset
 
 class LinearRegression(Model):
@@ -36,7 +37,7 @@ class LinearRegression(Model):
         self.x = x
         self.y = y
 
-        self.a, self.b = self._least_squares(x, y)
+        self.a, self.b = self._minimizing_error(x, y)
 
     def _least_squares(self, x:np.ndarray, y:np.ndarray) -> tuple:
         """
@@ -61,7 +62,7 @@ class LinearRegression(Model):
         b = (np.sum(y) - a * np.sum(x)) / n
         return a, b
 
-    def _minimizing_error(self, x:np.ndarray, y:np.ndarray) -> tuple:
+    def _minimizing_error(self, x:np.ndarray, y:np.ndarray, error_function:ErrorFunction = MeanSquaredError(), animation:bool = True) -> tuple:
         """
         Minimize the error to find the best fitted line
 
@@ -79,8 +80,40 @@ class LinearRegression(Model):
         b:float
             Intercept of the linear function
         """
-        pass
+        a, b = 1.0, 0.0
+        lr = 0.001  # taux d'apprentissage
+        a_values = [a]
+        b_values = [b]
+
+        for epoch in range(1000):
+            y_pred = a * x + b
+            grad_a = np.mean(error_function.derivative(y, y_pred) * x)
+            grad_b = np.mean(error_function.derivative(y, y_pred))
+            a -= lr * grad_a
+            b -= lr * grad_b
+            a_values.append(a)
+            b_values.append(b)
+
+        if animation:
+            self._animate(a_values, b_values,x, y)
+
+        return a, b
     
+    def _animate(self, a_values:np.ndarray, b_values:np.ndarray, x:np.ndarray, y:np.ndarray):
+        fig, ax = plt.subplots()
+        ax.scatter(x, y, color='blue')
+        line, = ax.plot([], [], color='red', linewidth=2)
+        ax.set_title("Descente de gradient")
+
+        def update(frame):
+            y_pred = a_values[frame] * x + b_values[frame]
+            line.set_data(x, y_pred)
+            ax.set_title(f"Epoch {frame}: a={a_values[frame]:.2f}, b={b_values[frame]:.2f}")
+            return line,
+
+        ani = FuncAnimation(fig, update, frames=len(a_values), interval=10, blit=True)
+        plt.show()
+
     def _predict(self, x:np.ndarray) -> np.ndarray:
         """
         Predict the result points using the linear function
@@ -113,7 +146,7 @@ class LinearRegression(Model):
 
 def main():
     # Example usage
-    x, y = linear_dataset(start=0, end=50, xstep=0.5, a=2, b=3, ynoise=20, seed=42)
+    x, y = linear_dataset(start=0, end=50, xstep=0.5, a=-2, b=3, ynoise=20, seed=42)
 
     model = LinearRegression()
     model.fit(x, y)
