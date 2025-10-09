@@ -57,7 +57,7 @@ def make_classification(
     return (X, y)
 
 def make_blobs(
-    n_samples: Union[int, np.ndarray] = 200, 
+    n_samples: Union[int, list] = 200, 
     n_features: int = 2,
     max_height: int = 5,
     max_width:int = 5,
@@ -67,11 +67,16 @@ def make_blobs(
     """"""
     if isinstance(n_samples, int):
         # Generate an equally numbers of points
-        n_samples = np.ndarray([n_samples // n_classes for _ in  range(n_classes)])
+        n_samples = [n_samples // n_classes for _ in  range(n_classes)]
     
     centers = np.random.uniform(0, max_height, (n_classes, n_features))
 
     X = deepcopy(centers)
     y = np.array([i for i in range(n_classes)])
+
+    for idx, pos in enumerate(centers):
+        print(np.random.normal(pos, 2, (n_samples[idx], n_features)))
+        X = np.append(X, np.random.normal(pos, 2, (n_samples[idx], n_features)), axis=0)
+        y = np.append(y, np.array([idx for _ in range(n_samples[idx])]) ,axis=0)
 
     return (X, y)
