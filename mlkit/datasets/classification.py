@@ -1,4 +1,6 @@
 import numpy as np
+from typing import Union
+from copy import deepcopy
 
 def make_classification(
     n_samples: int = 200, 
@@ -46,12 +48,30 @@ def make_classification(
     Notes
     -----
     Cette version simplifiée ne gère que la génération de points séparables par classes. 
-    Pour des datasets plus complexes, des options comme la séparation des classes, le 
-    bruit ou des clusters multiples peuvent être ajoutées.
     """
     rng = np.random.default_rng(seed=random_state)
     X = rng.random((n_samples, n_features))
     
     y = rng.integers(0, n_classes, size=n_samples)
+
+    return (X, y)
+
+def make_blobs(
+    n_samples: Union[int, np.ndarray] = 200, 
+    n_features: int = 2,
+    max_height: int = 5,
+    max_width:int = 5,
+    n_classes: int = 2, 
+    random_state: int = 42
+) -> tuple[np.ndarray, np.ndarray]:
+    """"""
+    if isinstance(n_samples, int):
+        # Generate an equally numbers of points
+        n_samples = np.ndarray([n_samples // n_classes for _ in  range(n_classes)])
+    
+    centers = np.random.uniform(0, max_height, (n_classes, n_features))
+
+    X = deepcopy(centers)
+    y = np.array([i for i in range(n_classes)])
 
     return (X, y)
