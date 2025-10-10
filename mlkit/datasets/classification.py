@@ -59,24 +59,24 @@ def make_classification(
 def make_blobs(
     n_samples: Union[int, list] = 200, 
     n_features: int = 2,
-    max_height: int = 5,
-    max_width:int = 5,
-    n_classes: int = 2, 
+    max_height: int = 1,
+    max_width:int = 2,
+    n_classes: int = 2,
+    a:float = 0.05,
     random_state: int = 42
 ) -> tuple[np.ndarray, np.ndarray]:
     """"""
     if isinstance(n_samples, int):
         # Generate an equally numbers of points
         n_samples = [n_samples // n_classes for _ in  range(n_classes)]
-    
-    centers = np.random.uniform(0, max_height, (n_classes, n_features))
+
+    centers = np.random.uniform(np.array([0, 0]), np.array([max_width, max_height]), (n_classes, n_features))
 
     X = deepcopy(centers)
     y = np.array([i for i in range(n_classes)])
 
     for idx, pos in enumerate(centers):
-        print(np.random.normal(pos, 2, (n_samples[idx], n_features)))
-        X = np.append(X, np.random.normal(pos, 2, (n_samples[idx], n_features)), axis=0)
+        X = np.append(X, np.random.normal(pos, a, (n_samples[idx], n_features)), axis=0)
         y = np.append(y, np.array([idx for _ in range(n_samples[idx])]) ,axis=0)
 
     return (X, y)
