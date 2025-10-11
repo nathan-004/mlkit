@@ -13,3 +13,16 @@ def linear_dataset(start:float = 0, end:float = 10, xstep:float = 1, a:float = 1
     noise = np.random.uniform(-ynoise, ynoise, size=x.shape)
     y = a * x + b + noise
     return x, y
+
+def polymonial_dataset(start:float = 0, end:float = 10, xstep:float = 1, coeffs:list = [1, 0, 0], ynoise:float = 3, seed:int = None):
+    """
+    Generate a random dataset around the polynomial function defined by coeffs with random noise.
+    Returns numpy arrays for x and y.
+    """
+    if seed is not None:
+        np.random.seed(seed)
+    x = np.arange(start, end, xstep)
+    y = sum(c * x**i for i, c in enumerate(coeffs))
+    noise = np.random.uniform(-ynoise, ynoise, size=x.shape)
+    y += noise
+    return x, y

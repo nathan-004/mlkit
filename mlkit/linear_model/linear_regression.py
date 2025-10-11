@@ -5,7 +5,7 @@ import random
 
 from mlkit.utils.model import Model
 from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError, ErrorFunction
-from mlkit.datasets.continuous import linear_dataset
+from mlkit.datasets.continuous import linear_dataset, polymonial_dataset
 
 class LinearRegression(Model):
     """Solve Linear Problems with LinearRegression"""
@@ -140,19 +140,19 @@ class LinearRegression(Model):
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title('Linear Regression Fit')
-        plt.legend()
-        plt.show()
         plt.savefig("figures/linear_regression.png")
+        plt.show()
 
 def main():
     # Example usage
-    x, y = linear_dataset(start=0, end=50, xstep=0.5, a=-2, b=3, ynoise=20, seed=42)
+    #x, y = linear_dataset(start=0, end=50, xstep=0.5, a=2, b=3, ynoise=10, seed=42)
+    x, y = polymonial_dataset(start=0, end=200, xstep=0.5, coeffs=[1, 2, 2], ynoise=100, seed=42)
 
     model = LinearRegression()
     model.fit(x, y)
     y_pred = model.predict(x)
 
     print("Predicted values:", y_pred)
-
+    print(f"Function found : {model.a} * x + {model.b}")
 
     model.plot()
