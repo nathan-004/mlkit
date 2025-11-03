@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import random
+from copy import deepcopy
 
 from mlkit.utils.model import Model
 from mlkit.linear_model.error_functions import MeanSquaredError, MeanAbsoluteError, ErrorFunction
@@ -131,6 +131,7 @@ class LinearRegression(Model):
         assert len(x.shape) == 1, "x must be a 1D array"
         return self.a * x + self.b
     
+    @Model._dependance_check
     def plot(self):
         """
         Plot the datas and the linear function
@@ -140,19 +141,136 @@ class LinearRegression(Model):
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title('Linear Regression Fit')
-        plt.savefig("figures/linear_regression.png")
+        plt.legend()
         plt.show()
+        plt.savefig("figures/linear_regression.png")
+
+class PolymonialRegression(Model):
+    def __init__(self):
+        """
+        Parameters
+        ----------
+        To Complete
+        """
+        super().__init__()
+
+    def _fit(self, x:np.ndarray, y:np.ndarray):
+        """
+        Find the linear function of the datas
+        Predict continuous values
+        
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas in 1D array
+        y:np.ndarray
+            Result points in 1D array
+        """
+        assert len(x.shape) == 1, "x must be a 1D array"
+        assert len(y.shape) == 1, "y must be a 1D array"
+        assert x.shape[0] == y.shape[0], "x and y must have the same length"
+
+        self.x = x
+        self.y = y
+
+        self.coeffs = self._minimizing_error(x, y)
+
+    def _minimizing_error(self, x:np.ndarray, y:np.ndarray, deg=2, error_function:ErrorFunction = MeanSquaredError(), animation:bool = False) -> tuple:
+        """
+        Minimize the error to find the best fitted line
+
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas in 1D array
+        y:np.ndarray
+            Result points in 1D array
+
+        Returns
+        -------
+        a:float
+            Slope of the linear function
+        b:float
+            Intercept of the linear function
+        """
+        values = [0 for _ in range(deg + 1)] # In order, x0, x1, x2, ...
+        lr = 0.001  # taux d'apprentissage
+        time_values = [[val] for val in values]
+
+        for epoch in range(1000):
+            y_pred = self._calculate_polymonial(x, values)
+            for idx in range(len(values)):
+                grad = np.mean(error_function.derivative(y, y_pred) * (x ** idx))
+                val = values[idx] + lr * grad
+                values[idx] = val
+                time_values[idx].append(val)
+            print(error_function.compute(y, y_pred))
+        if animation:
+            self._animate(time_values[0], time_values[1],x, y)
+
+        return values
+    
+    def _animate(self, a_values:np.ndarray, b_values:np.ndarray, x:np.ndarray, y:np.ndarray):
+        fig, ax = plt.subplots()
+        ax.scatter(x, y, color='blue')
+        line, = ax.plot([], [], color='red', linewidth=2)
+        ax.set_title("Descente de gradient")
+
+        def update(frame):
+            y_pred = a_values[frame] * x + b_values[frame]
+            line.set_data(x, y_pred)
+            ax.set_title(f"Epoch {frame}: a={a_values[frame]:.2f}, b={b_values[frame]:.2f}")
+            return line,
+
+        ani = FuncAnimation(fig, update, frames=len(a_values), interval=10, blit=True)
+        plt.show()
+
+    def _calculate_polymonial(self, x:np.ndarray, values:list[float]) -> np.ndarray:
+        x = deepcopy(x)
+        for idx, coeff in enumerate(values):
+            x += coeff * idx
+        return x
+    
+    def _predict(self, x:np.ndarray) -> np.ndarray:
+        """
+        Predict the result points using the polynomial function
+        
+        Parameters
+        ----------
+        x:np.ndarray
+            Inputs datas
+
+        Returns
+        -------
+        y_pred:np.ndarray
+            Predicted result points
+        """
+        return self._calculate_polymonial(x, self.coeffs)
+    
+    def plot(self):
+        """
+        Plot the datas and the linear function
+        """
+        plt.scatter(self.x, self.y, color='blue', label='Data points')
+        plt.plot(self.x, self._predict(self.x), color='red', label='Fitted line')
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Polynomial Regression Fit')
+        plt.legend()
+        plt.show()
+        plt.savefig("figures/polynomial_regression.png")
 
 def main():
     # Example usage
-    #x, y = linear_dataset(start=0, end=50, xstep=0.5, a=2, b=3, ynoise=10, seed=42)
-    x, y = polymonial_dataset(start=0, end=200, xstep=0.5, coeffs=[1, 2, 2], ynoise=100, seed=42)
+    x, y = polymonial_dataset(0, 50, 0.5, coeffs=[2,1,1], seed=42)
+    print(x, y)
 
-    model = LinearRegression()
+    model = PolymonialRegression()
     model.fit(x, y)
-    y_pred = model.predict(x)
+    # y_pred = model.predict(x)
 
-    print("Predicted values:", y_pred)
-    print(f"Function found : {model.a} * x + {model.b}")
+    # print("Predicted values:", y_pred)
 
     model.plot()
+    print(x==model.x, y == model.y)
+    print(model.coeffs)
