@@ -18,6 +18,11 @@ def polymonial_dataset(start:float = 0, end:float = 10, xstep:float = 1, coeffs:
     """
     Generate a random dataset around the polynomial function defined by coeffs with random noise.
     Returns numpy arrays for x and y.
+
+    Parameters
+    ----------
+    coeffs:list
+        [1, 0, 0] -> 1x^0 + 0x^1 + 0x^2
     """
     if seed is not None:
         np.random.seed(seed)
