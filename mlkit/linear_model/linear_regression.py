@@ -146,13 +146,14 @@ class LinearRegression(Model):
         plt.savefig("figures/linear_regression.png")
 
 class PolymonialRegression(Model):
-    def __init__(self):
+    def __init__(self, deg=2):
         """
         Parameters
         ----------
         To Complete
         """
         super().__init__()
+        self.deg = deg
 
     def _fit(self, x:np.ndarray, y:np.ndarray):
         """
@@ -175,7 +176,7 @@ class PolymonialRegression(Model):
 
         self.coeffs = self._minimizing_error(x, y)
 
-    def _minimizing_error(self, x:np.ndarray, y:np.ndarray, deg=2, error_function:ErrorFunction = MeanSquaredError(), animation:bool = True) -> tuple:
+    def _minimizing_error(self, x:np.ndarray, y:np.ndarray, error_function:ErrorFunction = MeanSquaredError(), animation:bool = True) -> tuple:
         """
         Minimize the error to find the best fitted line
 
@@ -193,8 +194,8 @@ class PolymonialRegression(Model):
         b:float
             Intercept of the linear function
         """
-        values = [0 for _ in range(deg + 1)] # In order, x0, x1, x2, ...
-        lr = 1e-5  # taux d'apprentissage
+        values = [0 for _ in range(self.deg + 1)] # In order, x0, x1, x2, ...
+        lr = 1 * 10 ** (-(5 + self.deg * 1.5))  # taux d'apprentissage
         time_values = [[val] for val in values]
 
         for epoch in range(1000):
@@ -264,10 +265,10 @@ class PolymonialRegression(Model):
 
 def main():
     # Example usage
-    x, y = polymonial_dataset(0, 50, 0.5, coeffs=[-2,1,-2], seed=42)
+    x, y = polymonial_dataset(0, 50, 0.5, coeffs=[-2,1,-2, -2], seed=42, ynoise=100)
     print(x, y)
 
-    model = PolymonialRegression()
+    model = PolymonialRegression(4)
     model.fit(x, y)
     y_pred = model.predict(x)
 
