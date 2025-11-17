@@ -5,7 +5,7 @@ from typing import NamedTuple
 from collections import defaultdict
 
 from mlkit.utils.model import Model
-from mlkit.datasets.classification import make_classification
+from mlkit.datasets.classification import make_blobs
 
 class KNeighborsClassifier(Model):
     """Use of the KNN algorithm to solve classification problems"""
@@ -112,7 +112,7 @@ class KNeighborsClassifier(Model):
         plt.show()
 
 def main():
-    X, y = make_classification(n_classes=4, n_samples=100)
+    X, y = make_blobs(n_classes=4, n_samples=100)
     a = KNeighborsClassifier(n_neighbors=10)
     a.fit(X, y)
     a.plot()
